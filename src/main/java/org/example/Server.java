@@ -7,15 +7,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Handler;
 
 public class Server {
 
     static ExecutorService executeIt = Executors.newFixedThreadPool(64);
-    final List<String> validPaths = List.of("/index.html", "/spring.png", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+    final List<String> validPaths = List.of("/index.html", "/spring.png", "/spring.svg", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Handler>> handlers = new ConcurrentHashMap<>();
 
-    private void connectionProcessing(Socket socket) {
+    private void connectionProcessing(Socket socket) { //обработка соединений
         try (socket; final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              final var out = new BufferedOutputStream(socket.getOutputStream())) {
 
@@ -74,6 +77,7 @@ public class Server {
 
     public void start(int port) {
         try (final var serverSocket = new ServerSocket(port)) {
+            System.out.println("Server started on port " + port);
             while (true) {
                 final var socket = serverSocket.accept();
                 executeIt.submit(() -> connectionProcessing(socket));
@@ -81,5 +85,12 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addHandler(String method, String path, Handler handler) {
+        if (!handlers.contains(method)) {
+            handlers.put(method, new ConcurrentHashMap<>());
+        }
+        handlers.get(method).put(path, handler);
     }
 }
