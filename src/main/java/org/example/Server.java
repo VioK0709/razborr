@@ -1,8 +1,14 @@
 package org.example;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -15,16 +21,17 @@ import java.util.logging.Handler;
 public class Server {
 
     static ExecutorService executeIt = Executors.newFixedThreadPool(64);
+
     final List<String> validPaths = List.of("/index.html", "/spring.png", "/spring.svg", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Handler>> handlers = new ConcurrentHashMap<>();
 
-    private void connectionProcessing(Socket socket) { //обработка соединений
+    private void connectionProcessing(Socket socket) throws URISyntaxException {
         try (socket; final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              final var out = new BufferedOutputStream(socket.getOutputStream())) {
 
             final var requestLine = in.readLine();
             final var parts = requestLine.split(" ");
-
             if (parts.length != 3) {
                 return;
             }
@@ -73,14 +80,28 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String url = null;
+        int i = url.indexOf("?");
+        if (i == -1) {
+            System.out.println(url);
+        }
+        String result = url.substring(0, i);
+        System.out.println(result);
     }
+
 
     public void start(int port) {
         try (final var serverSocket = new ServerSocket(port)) {
             System.out.println("Server started on port " + port);
             while (true) {
                 final var socket = serverSocket.accept();
-                executeIt.submit(() -> connectionProcessing(socket));
+                executeIt.submit(() -> {
+                    try {
+                        connectionProcessing(socket);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             }
         } catch (IOException e) {
             e.printStackTrace();
