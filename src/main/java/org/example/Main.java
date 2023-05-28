@@ -12,7 +12,6 @@ public class Main {
         initializeHandlers(server);
     }
 
-
     private static void initializeHandlers(Server server) {
         server.addHandler("GET", "/messages", new Handler() {
             @Override

@@ -1,17 +1,14 @@
 package org.example;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.io.BufferedReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import java.util.Optional;
 
 public class Request {
 
@@ -85,5 +82,10 @@ public class Request {
 
     public void setQueryParams(List<NameValuePair> queryParams) {
         this.queryParams = queryParams;
+    }
+
+
+    public List<NameValuePair> getBodyParams() {
+        return URLEncodedUtils.parse(body, Charset.forName("UTF-8"));
     }
 }
