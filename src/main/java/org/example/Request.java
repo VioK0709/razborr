@@ -80,6 +80,7 @@ public class Request {
         return queryParams;
     }
 
+
     public void setQueryParams(List<NameValuePair> queryParams) {
         this.queryParams = queryParams;
     }

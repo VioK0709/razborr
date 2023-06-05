@@ -4,5 +4,5 @@ import java.io.BufferedOutputStream;
 
 @FunctionalInterface  
 public interface Handler {
-    void handler(Request request, BufferedOutputStream outputStream);
+    void handle(Request request, BufferedOutputStream outputStream);
 }

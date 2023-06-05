@@ -166,11 +166,11 @@ public class Server {
         }
     }
 
-    public void addHandler(String method, String path, Handler handler) {
+    public void addHandler(String method, String path, Handler handle) {
         if (!handlers.contains(method)) {
             handlers.put(method, new ConcurrentHashMap<>());
         }
-        handlers.get(method).put(path, handler);
+        handlers.get(method).put(path, handle);
     }
 
 
